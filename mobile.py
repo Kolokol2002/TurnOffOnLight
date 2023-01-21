@@ -127,5 +127,5 @@ for p in list_out:
     data += p
 
 # print(data)
-pyperclip.copy(data)
-spam = pyperclip.paste()
+# pyperclip.copy(data)
+# spam = pyperclip.paste()
