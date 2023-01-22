@@ -75,44 +75,47 @@ async def on_startup_notify(dp: Dispatcher):
         if im_rigth_col == white_pix:
             # print(True)
             rigth = num_rigth
-            top += 62
+            top += 66
             break
 
     # cut image of deffind coordinate
     crop_res = image.crop((left, top, w - rigth, h - bottom))
+    # crop_res.show()
     image.close()
     w_size, h_size = crop_res.size
 
     # formula for cut group section
-    section_size = 28
-    group_size = number_group * 28
+    section_size = 30
+    group_size = number_group * 30
 
     # cut group section
     group = crop_res.crop((0, group_size - section_size, w_size, group_size))
 
     # check if equal image
     group_diff = Image.open('./group.png').convert('RGB')
-    diff = ImageChops.difference(group.convert('RGB'), group_diff)
+    diff = ImageChops.difference(group.convert('RGB'), group_diff).getbbox()
+    # diff = True
     group_diff.close()
-    if diff.getbbox():
+    if diff:
         group.save('./group.png')
 
         # colors for for group off or on
-        red = [(27, (255, 255, 255, 255)), (5, (222, 99, 57, 255)), (1, (50, 66, 87, 255)),
-               (1, (125, 99, 101, 255)), (1, (89, 83, 101, 255)), (787, (222, 116, 101, 255)),
-               (1, (191, 66, 23, 255)), (2, (158, 116, 101, 255)), (2, (89, 66, 87, 255)), (1, (222, 83, 40, 255)),
-               (3, (50, 0, 0, 255)), (1, (0, 0, 23, 255)), (2, (0, 0, 40, 255)), (3, (0, 0, 0, 255))]
+        red = [(1, (222, 116, 101, 255))]
+
         # list with clock off or on light
         list = []
 
         # cycle for deffind while will turn off ro on light
         image_groups = Image.open('./group.png')
         for i in range(0, 24):
-            start_img_group = (190) + (i * 31)
+            start_img_group = (202) + (i * 34)
             end_img_group = 27
-            image_group = image_groups.crop((start_img_group, 0, start_img_group + 31, end_img_group))
-            im1 = Image.Image.getcolors(image_group)
-            if im1 == red:
+            image_group = image_groups.crop((start_img_group, 0, start_img_group + 34, end_img_group))
+            # image_group.show()
+            im_pix = image_group.crop((0, 0, 1, 1))
+            im_col = Image.Image.getcolors(im_pix)
+            # print(im_col)
+            if im_col == red:
                 list.append(i)
             else:
                 list.append('|')
@@ -167,6 +170,7 @@ async def on_startup_notify(dp: Dispatcher):
             return data
 
         # send list in  telegram message (only admins)
+        # print(get_data())
         for admin in admins:
             try:
                 await dp.bot.send_message(admin, get_data())
