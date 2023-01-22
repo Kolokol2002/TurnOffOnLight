@@ -2,7 +2,7 @@ import logging
 
 import requests
 
-from PIL import Image
+from PIL import Image, ImageChops
 from aiogram import Dispatcher
 
 from data.config import admins
@@ -11,10 +11,13 @@ from data.config import admins
 async def on_startup_notify(dp: Dispatcher):
     for admin in admins:
         try:
-
+            #open oblenergo
             img = requests.get('http://oblenergo.cv.ua/shutdowns/GPV.png')
-            headers_date = img.headers['Date'].split()[-2][:-3]
 
+            #give date from image
+            # headers_date = img.headers['Date'].split()[-2][:-3]
+
+            #download image
             img_file = open('./gvp.png', 'wb')
             img_file.write(img.content)
             img_file.close()
@@ -22,15 +25,18 @@ async def on_startup_notify(dp: Dispatcher):
             image = Image.open('./gvp.png')
             w, h = image.size
 
+            #colors of pixel
             green_pix = [(1, (119, 136, 66, 255))]
             silver_pix = [(1, (217, 217, 217, 255))]
             white_pix = [(1, (255, 255, 255, 255))]
 
+            #coordinate to cut image
             left = int()
             top = int()
             rigth = int()
             bottom = int()
 
+            #deffind coordinate on image
             # top
             for num_top, i in enumerate(range(0, 300)):
                 im_top = image.crop((10, 0 + i, 10+1, 1+i))
@@ -40,7 +46,6 @@ async def on_startup_notify(dp: Dispatcher):
                     top = num_top
                     bottom = top + 1
                     break
-
             # left
             for num_left, i in enumerate(range(0, 300)):
                 im_left = image.crop((0 + i, top + 1, 1 + i, bottom + 1))
@@ -51,7 +56,6 @@ async def on_startup_notify(dp: Dispatcher):
                     left = num_left
                     bottom = int()
                     break
-
             # bottom
             for num_bottom, i in enumerate(range(0, 300)):
                 im_bottom = image.crop((left, h - 1 - i, left + 1, h - i))
@@ -61,7 +65,6 @@ async def on_startup_notify(dp: Dispatcher):
                     # print(True)
                     bottom = num_bottom
                     break
-
             # rigth
             for num_rigth, i in enumerate(range(0, 300)):
                 im_rigth = image.crop(((w - 1) - i, h - bottom, w - i, (h - bottom) + 1))
@@ -73,76 +76,88 @@ async def on_startup_notify(dp: Dispatcher):
                     top += 62
                     break
 
+            #cut image of deffind coordinate
             crop_res = image.crop((left, top, w - rigth, h - bottom))
-            # print(top)
+            image.close()
             w_size, h_size = crop_res.size
-            # print(w_size, h_size)
-            # crop_res.show()
 
+            #formula for cut group section
+            number_group = 14
             section_size = 28
-            group_size = 14 * section_size
+            group_size = number_group * 28
+
+            #cut group section
             group = crop_res.crop((0, group_size - section_size, w_size, group_size))
-            group.save('./group.png')
 
-            green = [(3, 0), (1, 4), (1, 7), (1, 23), (1, 75), (1, 91), (1, 97), (1, 123), (1, 128), (1, 153), (1, 156),
-                     (1, 174), (1, 182), (1, 193), (824, 199), (28, 255)]
-            red = [(27, (255, 255, 255, 255)), (5, (222, 99, 57, 255)), (1, (50, 66, 87, 255)),
-                   (1, (125, 99, 101, 255)), (1, (89, 83, 101, 255)), (787, (222, 116, 101, 255)),
-                   (1, (191, 66, 23, 255)), (2, (158, 116, 101, 255)), (2, (89, 66, 87, 255)), (1, (222, 83, 40, 255)),
-                   (3, (50, 0, 0, 255)), (1, (0, 0, 23, 255)), (2, (0, 0, 40, 255)), (3, (0, 0, 0, 255))]
+            #check if equal image
+            group_diff = Image.open('./group.png').convert('RGB')
+            diff = ImageChops.difference(group.convert('RGB'), group_diff)
+            group_diff.close()
+            if diff.getbbox():
+                group.save('./group.png')
 
-            list = []
-            image_groups = Image.open('./group.png')
+                #colors for for group off or on
+                red = [(27, (255, 255, 255, 255)), (5, (222, 99, 57, 255)), (1, (50, 66, 87, 255)),
+                       (1, (125, 99, 101, 255)), (1, (89, 83, 101, 255)), (787, (222, 116, 101, 255)),
+                       (1, (191, 66, 23, 255)), (2, (158, 116, 101, 255)), (2, (89, 66, 87, 255)), (1, (222, 83, 40, 255)),
+                       (3, (50, 0, 0, 255)), (1, (0, 0, 23, 255)), (2, (0, 0, 40, 255)), (3, (0, 0, 0, 255))]
+                #list with clock off or on light
+                list = []
 
-            end_img_group = 27
-            for i in range(0, 24):
-                start_img_group = (190) + (i * 31)
-                image_group = image_groups.crop((start_img_group, 0, start_img_group + 31, end_img_group))
-                im1 = Image.Image.getcolors(image_group)
-                if im1 == red:
-                    list.append(i)
-                else:
-                    list.append('|')
-                # image_group.show()
+                #cycle for deffind while will turn off ro on light
+                image_groups = Image.open('./group.png')
+                for i in range(0, 24):
+                    start_img_group = (190) + (i * 31)
+                    end_img_group = 27
+                    image_group = image_groups.crop((start_img_group, 0, start_img_group + 31, end_img_group))
+                    im1 = Image.Image.getcolors(image_group)
+                    if im1 == red:
+                        list.append(i)
+                    else:
+                        list.append('|')
+                image_groups.close()
 
-            list_test = []
-            list_res = []
-            for num, j in enumerate(list):
-                if num == 0:
-                    if type(j) is int:
-                        list_res.append([j])
-                else:
-                    if len(list_res) == 0:
+                #parse clock list
+                list_test = []
+                list_res = []
+                for num, j in enumerate(list):
+                    if num == 0:
                         if type(j) is int:
                             list_res.append([j])
                     else:
-                        len_list = len(list_res)
-                        if type(list_test[-1]) is int:
-                            if j == '|':
-                                if not list_test[-1] == list_res[-1][-1]:
-                                    list_res.append([list_test[-1]])
-
-                        if list_test[-1] == '|':
+                        if len(list_res) == 0:
                             if type(j) is int:
                                 list_res.append([j])
                         else:
-                            if type(j) is int:
-                                list_res[len_list - 1].append(j)
-                list_test.append(j)
+                            len_list = len(list_res)
+                            if type(list_test[-1]) is int:
+                                if j == '|':
+                                    if not list_test[-1] == list_res[-1][-1]:
+                                        list_res.append([list_test[-1]])
 
-            list_out = []
-            for count, k in enumerate(list_res):
-                list_count = len(list_res)
-                if count + 1 == list_count:
-                    list_out.append(f'{k[0]}-{k[-1] + 1}')
-                    continue
-                list_out.append(f'{k[0]}-{k[-1] + 1}\n')
+                            if list_test[-1] == '|':
+                                if type(j) is int:
+                                    list_res.append([j])
+                            else:
+                                if type(j) is int:
+                                    list_res[len_list - 1].append(j)
+                    list_test.append(j)
 
-            data = f'{headers_date}\n\n'
-            for p in list_out:
-                data += p
+                #parse list with result in normal view
+                list_out = []
+                for count, k in enumerate(list_res):
+                    list_count = len(list_res)
+                    if count + 1 == list_count:
+                        list_out.append(f'{k[0]}-{k[-1] + 1}')
+                        continue
+                    list_out.append(f'{k[0]}-{k[-1] + 1}\n')
 
-            await dp.bot.send_message(admin, data)
+                #parse list out for send in telegram
+                data = ''
+                for p in list_out:
+                    data += p
+                #send list in  telegram message (only admins)
+                await dp.bot.send_message(admin, data)
 
         except Exception as err:
             logging.exception(err)
