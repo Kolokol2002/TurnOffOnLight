@@ -11,6 +11,9 @@ from data.config import admins
 async def on_startup_notify(dp: Dispatcher):
     for admin in admins:
         try:
+            #number group
+            number_group = 14
+
             #open oblenergo
             img = requests.get('http://oblenergo.cv.ua/shutdowns/GPV.png')
 
@@ -82,7 +85,6 @@ async def on_startup_notify(dp: Dispatcher):
             w_size, h_size = crop_res.size
 
             #formula for cut group section
-            number_group = 14
             section_size = 28
             group_size = number_group * 28
 
@@ -154,6 +156,12 @@ async def on_startup_notify(dp: Dispatcher):
 
                 #parse list out for send in telegram
                 data = ''
+                if number_group == 1:
+                    data+= 'Зарожани\n'
+                if number_group == 2:
+                    data+= 'Млинки\n'
+                if number_group == 14:
+                    data += 'Че\n'
                 for p in list_out:
                     data += p
                 #send list in  telegram message (only admins)
