@@ -7,12 +7,13 @@ from aiogram import Dispatcher
 
 from data.config import admins
 
+from app import number_of_group
 
 async def on_startup_notify(dp: Dispatcher):
     for admin in admins:
         try:
             #number group
-            number_group = 14
+            number_group = number_of_group
 
             #open oblenergo
             img = requests.get('http://oblenergo.cv.ua/shutdowns/GPV.png')

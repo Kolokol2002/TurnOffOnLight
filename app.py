@@ -1,4 +1,12 @@
-# from utils.set_bot_commands import set_default_commands
+import argparse
+
+parser = argparse.ArgumentParser(description='Params for group')
+
+parser.add_argument("-g", "--group", help="Prints number your group.", default=14)
+
+args = parser.parse_args()
+
+number_of_group = int(args.group)
 
 
 async def on_startup(dp):
