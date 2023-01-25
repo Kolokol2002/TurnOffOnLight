@@ -1,3 +1,6 @@
 @echo off
-C:\Users\maksk\Desktop\project-on-python\TurnOffOnLight\venv\Scripts\python.exe C:\Users\maksk\Desktop\project-on-python\TurnOffOnLight\app.py -g 1
+cd C:\Users\maksk\Desktop\project-on-python\TurnOffOnLight\
+start .\kill_cmd.cmd
+start .\venv\Scripts\python.exe .\app.py -g 1
+
 

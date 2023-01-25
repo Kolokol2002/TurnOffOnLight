@@ -1,4 +1,5 @@
 import logging
+import time
 
 import requests
 
@@ -36,7 +37,7 @@ async def on_startup_notify(dp: Dispatcher):
     left = int()
     top = int()
     top_undo_green = int()
-    rigth = int()
+    rigth = w
     bottom = int()
     section_size_h = int()
 
@@ -78,17 +79,17 @@ async def on_startup_notify(dp: Dispatcher):
         if imm_bottom_col == silver_pix:
             bottom = num_bottom
             break
-    # rigth
-    for num_rigth, i in enumerate(range(0, 300)):
-        im_rigth = image.crop(((w - 1) - i, h - bottom, w - i, (h - bottom) + 1))
-
-        im_rigth_col = Image.Image.getcolors(im_rigth)
-        if im_rigth_col == white_pix:
-            rigth = num_rigth
-            break
+    # # rigth
+    # for num_rigth, i in enumerate(range(0, 300)):
+    #     im_rigth = image.crop(((w - 1) - i, h - bottom, w - i, (h - bottom) + 1))
+    #
+    #     im_rigth_col = Image.Image.getcolors(im_rigth)
+    #     if im_rigth_col == white_pix:
+    #         rigth = num_rigth
+    #         break
 
     # cut image of deffind coordinate
-    crop_res = image.crop((left, top, w - rigth, h - bottom))
+    crop_res = image.crop((left, top, rigth, h - bottom))
     image.close()
     w_size, h_size = crop_res.size
 
@@ -102,8 +103,8 @@ async def on_startup_notify(dp: Dispatcher):
     group_diff = Image.open('./group.png')
     group_diff_w, group_diff_h = group_diff.size
     group_diff = group_diff.crop((0, 0, group_diff_w, group_diff_h-1))
-    # diff = ImageChops.difference(group.convert('RGB'), group_diff.convert('RGB')).getbbox()
-    diff = True
+    diff = ImageChops.difference(group.convert('RGB'), group_diff.convert('RGB')).getbbox()
+    # diff = True
     group_diff.close()
     if diff:
         group.save('./group.png')
@@ -123,7 +124,7 @@ async def on_startup_notify(dp: Dispatcher):
         ect_pix_size = 0
 
         for left_sections in range(0, 400):
-            img_detect = image_groups.crop((0 + left_sections, 0, 1 + left_sections, 1))
+            img_detect = image_groups.crop((0 + left_sections, bottom_section-2, 1 + left_sections, bottom_section-1))
             img_col = Image.Image.getcolors(img_detect)
             # print(top_sections, img_col)
             if img_col == white_pix:
@@ -133,7 +134,7 @@ async def on_startup_notify(dp: Dispatcher):
                 black_counter = None
                 black_pix_size = 0
                 for j in range(0, 200):
-                    black_col_detect = image_groups.crop((left_sections + j, 0, left_sections + j + 1, 1))
+                    black_col_detect = image_groups.crop((left_sections + j, bottom_section-2, left_sections + j + 1, bottom_section-1))
                     black_col = Image.Image.getcolors(black_col_detect)
                     if black_col == black_pix:
                         if black_counter == red_pix or black_counter == green_pix:
@@ -154,7 +155,7 @@ async def on_startup_notify(dp: Dispatcher):
             if img_col == white_pix:
                 w_section = w_sections + 1
                 break
-
+        print(left_section, top_section, bottom_section, w_section)
         for i in range(0, 24):
             image_group = image_groups.crop((left_section+(i*w_section), top_section, left_section+(i*w_section)+w_section, bottom_section))
             im_pix = image_group.crop((5, 0, 6, 1))
@@ -214,7 +215,6 @@ async def on_startup_notify(dp: Dispatcher):
                 data += p
             return data
 
-        print(get_data())
         # send list in  telegram message (only admins)
         for admin in admins:
             try:
@@ -222,3 +222,14 @@ async def on_startup_notify(dp: Dispatcher):
 
             except Exception as err:
                 logging.exception(err)
+
+    else:
+        for admin in admins:
+            try:
+                id = await dp.bot.send_message(admin, "False")
+                time.sleep(5)
+                await dp.bot.delete_message(454836837, id['message_id'])
+
+            except Exception as err:
+                logging.exception(err)
+
