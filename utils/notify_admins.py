@@ -224,12 +224,11 @@ async def on_startup_notify(dp: Dispatcher):
                 logging.exception(err)
 
     else:
-        for admin in admins:
-            try:
-                id = await dp.bot.send_message(admin, "False")
-                time.sleep(5)
-                await dp.bot.delete_message(454836837, id['message_id'])
+        try:
+            id = await dp.bot.send_message(454836837, "False")
+            time.sleep(5)
+            await dp.bot.delete_message(454836837, id['message_id'])
 
-            except Exception as err:
-                logging.exception(err)
+        except Exception as err:
+            logging.exception(err)
 
