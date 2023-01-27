@@ -1,12 +1,15 @@
-import argparse
+import requests
+import json
+url = 'https://api.jsonbin.io/v3/b/63d42f19ace6f33a22c94f26/latest'
+headers = {
+  'X-Master-Key': '$2b$10$TWMYDoj4.wAMi7q.1XwiieeX.NwIRU68gFC9.ILWiivN2vsPtB0DO',
+}
 
-parser = argparse.ArgumentParser(description='Params for group')
+req = requests.get(url,  json=None, headers=headers).json()
+y = json.dumps(req)
+x = json.loads(y)
 
-parser.add_argument("-g", "--group", help="Prints number your group.", default=14)
-
-args = parser.parse_args()
-
-number_of_group = int(args.group)
+number_of_group = x['record']['group']
 
 
 async def on_startup(dp):
