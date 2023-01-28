@@ -252,8 +252,9 @@ async def on_startup_notify(dp: Dispatcher):
         for admin in admins:
             try:
                 await dp.bot.send_message(admin, get_data())
-                raise SystemExit()
 
             except Exception as err:
                 logging.exception(err)
+
+        raise SystemExit()
 
