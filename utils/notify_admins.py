@@ -28,7 +28,7 @@ async def on_startup_notify(dp: Dispatcher):
     # number group
     number_group = number_of_group
 
-    url_for_date = requests.get('http://oblenergo.cv.ua/shutdowns')
+    url_for_date = requests.get('https://oblenergo.cv.ua/shutdowns/?next')
     soup = BeautifulSoup(url_for_date.content, "html.parser")
 
     current_date_group = soup.find("div", {"data-id": str(number_group)}).text
