@@ -13,6 +13,9 @@ from data.config import admins
 
 from app import number_of_group
 
+
+from datetime import datetime
+
 async def on_startup_notify(dp: Dispatcher):
     #virtual variable
     url_data_put = 'https://api.jsonbin.io/v3/b/63d521a9c0e7653a0563205b'
@@ -28,14 +31,37 @@ async def on_startup_notify(dp: Dispatcher):
     # number group
     number_group = number_of_group
 
-    url_for_date = requests.get('https://oblenergo.cv.ua/shutdowns/?next')
+    url_for_date = None
+    if datetime.now().strftime("%H") <= '21':
+        url_for_date = requests.get('https://oblenergo.cv.ua/shutdowns')
+    else:
+        url_for_date = requests.get('https://oblenergo.cv.ua/shutdowns/?next')
+
+
     soup = BeautifulSoup(url_for_date.content, "html.parser")
 
-    current_date_group = soup.find("div", {"data-id": str(number_group)}).text
+    current_date_group = soup.find("div", {"data-id": '14'}).text
+
+    res_list = []
+    test_list = None
+    for i in current_date_group:
+        if i == 'м':
+            test_list = i
+            continue
+        if test_list == 'м':
+            if i == 'з':
+                res_list.append('з')
+                test_list = i
+                continue
+        if i == 'з':
+            res_list.append('з')
+        if i == 'в':
+            res_list.append('в')
+        test_list = i
 
     list_date = []
-    for num, i in enumerate(current_date_group):
-        if i == 'в':
+    for num, f in enumerate(res_list):
+        if f == 'в':
             list_date.append(num)
         else:
             list_date.append('|')

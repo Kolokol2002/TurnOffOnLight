@@ -1,3 +1,5 @@
+import datetime
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -7,81 +9,27 @@ soup = BeautifulSoup(url_for_date.content, "html.parser")
 
 current_date = soup.find("div", {"data-id": "14"}).text
 
-print(current_date)
-
-
-list = []
-for num, i in enumerate(current_date):
-    if i == 'в':
-        list.append(num)
-    else:
-        list.append('|')
-
-print(list)
-
-list_test = []
-list_res = []
-for num, j in enumerate(list):
-    if num == 0:
-        if type(j) is int:
-            list_res.append([j])
-    else:
-        if len(list_res) == 0:
-            if type(j) is int:
-                list_res.append([j])
-        else:
-            len_list = len(list_res)
-            if type(list_test[-1]) is int:
-                if j == '|':
-                    if not list_test[-1] == list_res[-1][-1]:
-                        list_res.append([list_test[-1]])
-
-            if list_test[-1] == '|':
-                if type(j) is int:
-                    list_res.append([j])
-            else:
-                if type(j) is int:
-                    list_res[len_list - 1].append(j)
-    list_test.append(j)
-
-print(list_res)
-
-list_out = []
-for count, k in enumerate(list_res):
-    list_count = len(list_res)
-    if count + 1 == list_count:
-        list_out.append(f'{k[0]}-{k[-1] + 1}')
+print(list(current_date))
+res_list = []
+test_list = None
+for i in current_date:
+    if i == 'м':
+        test_list = i
         continue
-    list_out.append(f'{k[0]}-{k[-1] + 1}')
+    if test_list == 'м':
+        if i == 'з':
+            res_list.append('з')
+            test_list = i
+            continue
+    if i == 'з':
+        res_list.append('з')
+    if i == 'в':
+        res_list.append('в')
+    test_list = i
 
-print(list_out)
-# for num ,i in enumerate(current_date):
-#     if i == "в":
-#         print(num)
+print(current_date)
+from datetime import datetime
 
-# list_test = []
-# list_res = []
-# for num, j in enumerate(current_date):
-#     if num == 0:
-#         if j == "з":
-#             list_res.append([j])
-#     else:
-#         if len(list_res) == 0:
-#             if j == "з":
-#                 list_res.append([j])
-#         else:
-#             len_list = len(list_res)
-#             if list_test[-1] == "з":
-#                 if j == 'в':
-#                     if not list_test[-1] == list_res[-1][-1]:
-#                         list_res.append([list_test[-1]])
-#
-#             if list_test[-1] == 'в':
-#                 if j == "в":
-#                     list_res.append([j])
-#             else:
-#                 if j == "з":
-#                     list_res[len_list - 1].append(j)
-#     list_test.append(j)
-#
-# print(list_res, list_test)
+time = datetime.now().strftime("%H")
+print(type(time))
+
