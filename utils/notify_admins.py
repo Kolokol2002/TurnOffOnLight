@@ -50,7 +50,7 @@ async def on_startup_notify(dp: Dispatcher):
             continue
         if test_list == 'м':
             if i == 'з':
-                res_list.append('з')
+                res_list.append('в')
                 test_list = i
                 continue
         if i == 'з':
