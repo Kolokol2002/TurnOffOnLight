@@ -29,7 +29,7 @@ async def on_startup_notify(dp: Dispatcher):
     }
 
     # number group
-    number_group = number_of_group
+    number_group = str(number_of_group)
 
     url_for_date = requests.get('https://oblenergo.cv.ua/shutdowns')
     soup = BeautifulSoup(url_for_date.content, "html.parser")
@@ -43,7 +43,7 @@ async def on_startup_notify(dp: Dispatcher):
 
 
 
-    current_date_group = soup.find("div", {"data-id": '14'}).text
+    current_date_group = soup.find("div", {"data-id": number_group}).text
 
     res_list = []
     test_list = None
@@ -110,11 +110,11 @@ async def on_startup_notify(dp: Dispatcher):
 
     def get_data():
         data = ''
-        if number_group == 1:
+        if number_group == "1":
             data += 'Зарожани |\n'
-        if number_group == 2:
+        if number_group == "2":
             data += 'Млинки |\n'
-        if number_group == 14:
+        if number_group == "14":
             data += 'Че |\n'
         for p in list_out:
             data += f'{p} |\n'
